@@ -1,0 +1,6 @@
+# Ignorar archivos de sistema
+.DS_Store
+
+# Ignorar archivos de caché de Python
+__pycache__/
+

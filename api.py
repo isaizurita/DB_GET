@@ -1,9 +1,12 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Depends
 from typing import Optional
 from pydantic import BaseModel
 import shutil
 import os
 import uuid
+import orm.repo as repo #Funciones para hacer consultas a la DB
+from sqlalchemy.orm import Session
+from orm.config import generador_sesion #Generador de sesiones
 
 # creación del servidor
 app = FastAPI()
@@ -61,10 +64,19 @@ def compras_usuario_por_id(id: int, id_compra: int):
     return compra
 
 @app.get("/usuarios/{id}")
-def usuario_por_id(id: int):
-    print("buscando usuario por id:", id)
-    # simulamos consulta a la base:
-    return usuarios[id]
+def usuario_por_id(id: int, sesion: Session=Depends(generador_sesion)):
+    print("Api consultando usuario por ID")
+    return repo.usuario_por_id(sesion, id)
+
+@app.get("/compras/{id}")
+def compra_por_id(id: int, sesion: Session=Depends(generador_sesion)):
+    print("Api consultando compra por ID")
+    return repo.compra_por_id(sesion, id)
+
+@app.get("/fotos/{id}")
+def foto_por_id(id: int, sesion: Session=Depends(generador_sesion)):
+    print("Api consultando foto por ID")
+    return repo.foto_por_id(sesion, id)
 
 @app.get("/usuarios")
 def lista_usuarios(*,lote:int=10,pag:int,orden:Optional[str]=None): #parametros de consulta ?lote=10&pag=1
