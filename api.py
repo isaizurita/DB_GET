@@ -68,6 +68,11 @@ def usuario_por_id(id: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando usuario por ID")
     return repo.usuario_por_id(sesion, id)
 
+@app.get("/usuarios")
+def lista_usuarios_db(sesion: Session=Depends(generador_sesion)):
+    print("Api consultando todos los usuarios")
+    return repo.lista_usuarios_db(sesion)
+
 @app.get("/compras/{id}")
 def compra_por_id(id: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando compra por ID")
@@ -78,11 +83,13 @@ def foto_por_id(id: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando foto por ID")
     return repo.foto_por_id(sesion, id)
 
+'''
 @app.get("/usuarios")
 def lista_usuarios(*,lote:int=10,pag:int,orden:Optional[str]=None): #parametros de consulta ?lote=10&pag=1
     print("lote:",lote, " pag:", pag, " orden:", orden)
     #simulamos la consulta
     return usuarios
+'''
 
 @app.post("/usuarios")
 def guardar_usuario(usuario:UsuarioBase, parametro1:str):

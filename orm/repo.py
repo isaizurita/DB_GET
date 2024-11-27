@@ -16,3 +16,7 @@ def compra_por_id(sesion: Session, id_compra: int):
 def foto_por_id(sesion: Session, id_foto: int):
     print("select * from app.fotos where id= ", id_foto)
     return sesion.query(modelos.Usuario).filter(modelos.Fotos.id==id_foto).first()
+
+def lista_usuarios_db(sesion: Session):
+    print("select * from app.usuarios")
+    return sesion.query(modelos.Usuario).all()
