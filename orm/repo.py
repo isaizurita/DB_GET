@@ -139,3 +139,67 @@ def actualiza_compra(sesion: Session, id_compra: int, compra_esquema: esquemas.C
     else: 
         respuesta={"mensaje":"No existe la compra"}
         return respuesta
+    
+#POST '/usuarios
+def guardar_usuario(sesion: Session, usr_nuevo: esquemas.UsuarioBase):
+
+    #Crear un nuevo objeto de la clase modelo Usuario
+    usr_bd = modelos.Usuario()
+    #Llenamos el nuevo objeto con los parámetros que nos pasó el usuario
+    usr_bd.nombre = usr_nuevo.nombre
+    usr_bd.edad = usr_nuevo.edad
+    usr_bd.domicilio = usr_nuevo.domicilio
+    usr_bd.email = usr_nuevo.email
+    usr_bd.password = usr_nuevo.password
+    #Insertar el nuevo objeto a la Base de Datos
+    sesion.add(usr_bd)
+    #Confirmamos el cambio
+    sesion.commit()
+    #Hacemos un refresh
+    sesion.refresh(usr_bd)
+    return usr_bd
+
+#POST '/usuarios/{id}/compras
+def guardar_compra(sesion: Session, usuario_id: int, compra_nueva: esquemas.CompraBase):
+    # Verificar si el usuario existe utilizando usuario_por_id
+    usuario = usuario_por_id(sesion, usuario_id)
+
+    if not usuario:
+        mensaje={"Mensaje":"Usuario no encontrado"}
+        return mensaje
+
+    else:
+        # Crear un nuevo objeto de la clase modelo Compra
+        compra_bd = modelos.Compra()
+        # Llenar el nuevo objeto con los parámetros que nos pasó el usuario
+        compra_bd.id_usuario = usuario_id
+        compra_bd.producto = compra_nueva.producto
+        compra_bd.precio = compra_nueva.precio
+
+        # Insertar el nuevo objeto en la Base de Datos
+        sesion.add(compra_bd)
+        # Confirmar el cambio
+        sesion.commit()
+        # Hacer un refresh
+        sesion.refresh(compra_bd)
+        return compra_bd
+
+#POST '/usuarios/{id}/fotos
+def guardar_foto(sesion: Session, usuario_id: int, foto_nueva: esquemas.FotoBase):
+    usuario = usuario_por_id(sesion, usuario_id)
+
+    if not usuario:
+        mensaje={"Mensaje":"Usuario no encontrado"}
+        return mensaje
+    
+    else:
+        foto_db = modelos.Fotos()
+        foto_db.id_usuario = usuario_id
+        foto_db.titulo = foto_nueva.titulo
+        foto_db.descripcion = foto_nueva.descripcion
+        foto_db.ruta = foto_nueva.ruta
+        
+        sesion.add(foto_db)
+        sesion.commit()
+        sesion.refresh(foto_db)
+        return foto_db

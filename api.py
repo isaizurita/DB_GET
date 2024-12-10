@@ -139,3 +139,17 @@ async def guardar_foto(titulo:str=Form(None), descripcion:str=Form(...), foto:Up
         imagen.write(contenido)
 
     return {"titulo":titulo, "descripcion":descripcion, "foto":foto.filename}
+
+@app.post("/usuarios")
+def guardar_usuario(usuario: esquemas.UsuarioBase, sesion: Session=Depends(generador_sesion)):
+    print(usuario)
+    #Guardado en la base
+    return repo.guardar_usuario(sesion, usuario)
+
+@app.post("/usuarios/{id}/compras")
+def guardar_compra(id: int, compra: esquemas.CompraBase, sesion: Session=Depends(generador_sesion)):
+    return repo.guardar_compra(sesion, id, compra)
+
+@app.post("/usuarios/{id}/fotos")
+def guardar_foto(id: int, foto: esquemas.FotoBase, sesion: Session=Depends(generador_sesion)):
+    return repo.guardar_foto(sesion, id, foto)
