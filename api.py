@@ -1,5 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, Form, Depends
-from typing import Optional
+from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException
+from typing import Optional, List
 from pydantic import BaseModel
 import shutil
 import os
@@ -7,15 +7,10 @@ import uuid
 import orm.repo as repo #Funciones para hacer consultas a la DB
 from sqlalchemy.orm import Session
 from orm.config import generador_sesion #Generador de sesiones
+import orm.esquemas as esquemas
 
 # creación del servidor
 app = FastAPI()
-
-#definición de la base del usuario
-class UsuarioBase(BaseModel):
-    nombre:Optional[str]=None
-    edad:int
-    domicilio:str    
     
 usuarios = [{
     "id": 0,
@@ -68,15 +63,33 @@ def usuario_por_id(id: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando usuario por ID")
     return repo.usuario_por_id(sesion, id)
 
+@app.get("/usuarios/{id}/fotos")
+def fotos_por_id_usr(id: int, sesion: Session=Depends(generador_sesion)):
+    print("API consultando fotos del usuario ", id)
+    return repo.fotos_por_id_usuario(sesion, id)
+
+@app.get("/usuarios/{id}/compras")
+def compras_por_id_usr(id: int, sesion: Session=Depends(generador_sesion)):
+    print("API consultando compras por usuario ", id)
+    return repo.compras_por_id_usuario(sesion,id)
+
+# "/compras?edad_min={edad_min}&edad_max={edad_max}"
 @app.get("/usuarios")
-def lista_usuarios_db(sesion: Session=Depends(generador_sesion)):
+def lista_usuarios_db(edad_min: int, edad_max: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando todos los usuarios")
-    return repo.lista_usuarios_db(sesion)
+    return repo.lista_usuarios_edad(sesion, edad_min, edad_max)
+
 
 @app.get("/compras/{id}")
 def compra_por_id(id: int, sesion: Session=Depends(generador_sesion)):
     print("Api consultando compra por ID")
     return repo.compra_por_id(sesion, id)
+
+# "/compras?id_usuario={id_usr}&precio={p}"
+@app.get("/compras")
+def lista_compras(id_usuario:int,precio:float,sesion:Session=Depends(generador_sesion)):
+    print("/compras?id_usuario={id_usr}&precio={p}")
+    return repo.devuelve_compras_por_usuario_precio(sesion,id_usuario,precio)
 
 @app.get("/fotos/{id}")
 def foto_por_id(id: int, sesion: Session=Depends(generador_sesion)):
@@ -91,43 +104,23 @@ def lista_usuarios(*,lote:int=10,pag:int,orden:Optional[str]=None): #parametros 
     return usuarios
 '''
 
-@app.post("/usuarios")
-def guardar_usuario(usuario:UsuarioBase, parametro1:str):
-    print("usuario a guardar:", usuario, ", parametro1:", parametro1)
-    #simulamos guardado en la base.
-    
-    usr_nuevo = {}
-    usr_nuevo["id"] = len(usuarios)
-    usr_nuevo["nombre"] = usuario.nombre
-    usr_nuevo["edad"] = usuario.edad
-    usr_nuevo["domicilio"] = usuario.domicilio
-
-    usuarios.append(usuario)
-
-    return usr_nuevo
-
 @app.put("/usuario/{id}")
-def actualizar_usuario(id:int, usuario:UsuarioBase):
-    #simulamos consulta
-    usr_act = usuarios[id]
-    #simulamos la actualización
-    usr_act["nombre"] = usuario.nombre
-    usr_act["edad"] = usuario.edad
-    usr_act["domicilio"] = usuario.domicilio    
+def actualizar_usuario(id:int,info_usuario: esquemas.UsuarioBase, sesion: Session=Depends(generador_sesion)):
+    repo.actualiza_usuario(sesion, id, info_usuario)
 
-    return usr_act
+@app.put("/fotos/{id}")
+def actualizar_foto(id:int, info_foto: esquemas.FotoBase, sesion: Session=Depends(generador_sesion)):
+    repo.actualiza_foto(sesion, id, info_foto)
+
+@app.put("/compras/{id}")
+def actualizar_compra(id:int, info_compra: esquemas.CompraBase, sesion: Session=Depends(generador_sesion)):
+    repo.actualiza_compra(sesion, id, info_compra)
     
 @app.delete("/usuario/{id}")
-def borrar_usuario(id:int):
-    #simulamos una consulta
-    if id>=0 and id< len(usuarios):
-        usuario = usuarios[id]
-    else:
-        usuario = None
-    
-    if usuario is not None:
-        usuarios.remove(usuario)
-    
+def borrar_usuario(id:int, sesion: Session=Depends(generador_sesion)):
+    repo.borrar_compras_por_id_usuario(sesion,id)
+    repo.borrar_fotos_por_id_usuario(sesion, id)
+    repo.borra_usuario_por_id(sesion,id)
     return {"status_borrado", "ok"}
 
 @app.post("/fotos")

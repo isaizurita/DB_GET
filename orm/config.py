@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 #1. Configurar la conexion BD
 # Crear la URL de la BD -> servidorBD://usuario:password@url:puerto/nombreBD
-URL_BASE_DATOS = "postgresql://isaizurita:704250@localhost:5432/isaizurita"
+URL_BASE_DATOS = "postgresql://isaizurita:704250@localhost:5432/prueba_api"
 # Conectarnos mediante el esquema app
 engine = create_engine(URL_BASE_DATOS,
                        connect_args={
