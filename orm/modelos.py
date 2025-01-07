@@ -3,8 +3,13 @@
 from orm.config import BaseClass
 #Importar de SQAlchemy los tipos de datos que usan las tablas
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Float
+# declarative_base permite definir la clase base para mapear las tablas de la BD
+from sqlalchemy.ext.declarative import declarative_base
 #Para calcular la hora actual
 import datetime
+
+#3.- Obtener la clase base para mapear tablas
+BaseClass = declarative_base()
 
 class Usuario(BaseClass):
     __tablename__="usuarios"
