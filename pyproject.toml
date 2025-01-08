@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "sd240_posgresql-fastapi"
+name = "prueba_isai_render"
 version = "0.1.0"
 description = "Example of FastAPI deployment to render.com"
-authors = ["Daniela Aguirre-Guerrero <daguirre@cua.uam.mx>"]
+authors = ["Isaí Zurita <isai.zurita@cua.uam.mx>"]
 readme = "README.md"
 package-mode = false
 
